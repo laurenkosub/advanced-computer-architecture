@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 {
 	volatile _IODEV int *uart_ptr = (volatile _IODEV int *)	PATMOS_IO_UART;
 	volatile _IODEV int *led_ptr  = (volatile _IODEV int *) PATMOS_IO_LED;
-	volatile _IODEV int *disp_ptr = (volatile _IODEV int *)	PATMOS_IO_SEGDISP;
+	volatile _IODEV int *disp_ptr = (volatile _IODEV int *)	0xf0050000;
 
 	int intro, i, j;
 
