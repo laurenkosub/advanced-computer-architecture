@@ -10,7 +10,7 @@ void blink(int period);
 
 void slave(void* param);
 
-int main() {
+int activateLeds() {
 	int slave_param = 1;
 	printf("I am alive!\n");
 	for(int i = 0; i < get_cpucnt(); i++) {

@@ -39,15 +39,15 @@ class Tuner(displayCnt : Int, polarity: Int) extends CoreDevice() {
         result := Bits("b1000001")
         switch(data(3,0)){
             is(Bits("b0000")){ result := Bits("b1000000") } //0
-            is(Bits("b0001")){ result := Bits("b1111001") }
-            is(Bits("b0010")){ result := Bits("b0100100") }
-            is(Bits("b0011")){ result := Bits("b0110000") }
-            is(Bits("b0100")){ result := Bits("b0011001") }
+            is(Bits("b0001")){ result := Bits("b1111001") } 
+            is(Bits("b0010")){ result := Bits("b0010001") } // change 2 to Y
+            is(Bits("b0011")){ result := Bits("b1001000") } // change 3 to n
+            is(Bits("b0100")){ result := Bits("b0000111") } // change 4 to t
             is(Bits("b0101")){ result := Bits("b0010010") }
-            is(Bits("b0110")){ result := Bits("b0000010") }
-            is(Bits("b0111")){ result := Bits("b1111000") }
-            is(Bits("b1000")){ result := Bits("b0000000") }
-            is(Bits("b1001")){ result := Bits("b0011000") }
+            is(Bits("b0110")){ result := Bits("b1110111") } // change 6 to _ 
+            is(Bits("b0111")){ result := Bits("b1001100") } // change 7 to r
+            is(Bits("b1000")){ result := Bits("b0000000") }  
+            is(Bits("b1001")){ result := Bits("b1000001") } // change 9 to u
             is(Bits("b1010")){ result := Bits("b0001000") } //a
             is(Bits("b1011")){ result := Bits("b0000011") } // b
             is(Bits("b1100")){ result := Bits("b1000110") } // c
@@ -57,64 +57,6 @@ class Tuner(displayCnt : Int, polarity: Int) extends CoreDevice() {
         }
         if (polarity==0) { result } else { ~result }
     } 
-
-/*
-    def sevsegFreqToNote(data : Double) : Bits = {
-        val result = Bits(width = 7)
-        result := Bits("b1000001")
-
-        // C
-        when((data > 16 && data < 17) || (data > 32 && data < 35) ||
-            (data > 65 && data < 69) || (data > 130 && data < 138) ||
-            (data > 261 && data < 277) || (data > 523 && data < 554) ||
-            (data > 1046 && data < 1108) || (data > 2093 && data < 2217) ||
-            (data > 4186 && data < 4434)) { result := Bits("b1000110") }
-        
-        // D 
-        when((data > 17 && data < 17) || (data > 32 && data < 35) ||
-            (data > 65 && data < 69) || (data > 130 && data < 138) ||
-            (data > 261 && data < 277) || (data > 523 && data < 554) ||
-            (data > 1046 && data < 1108) || (data > 2093 && data < 2217) ||
-            (data > 4186 && data < 4434)) { result := Bits("b0100001") }
-       
-        // E
-        when((data > 16 && data < 17) || (data > 32 && data < 35) ||
-            (data > 65 && data < 69) || (data > 130 && data < 138) ||
-            (data > 261 && data < 277) || (data > 523 && data < 554) ||
-            (data > 1046 && data < 1108) || (data > 2093 && data < 2217) ||
-            (data > 4186 && data < 4434)) { result := Bits("b0000110") }
-
-        // F
-        when((data > 16 && data < 17) || (data > 32 && data < 35) ||
-            (data > 65 && data < 69) || (data > 130 && data < 138) ||
-            (data > 261 && data < 277) || (data > 523 && data < 554) ||
-            (data > 1046 && data < 1108) || (data > 2093 && data < 2217) ||
-            (data > 4186 && data < 4434)) { result := Bits("b0001110") }
-
-        // G
-        when((data > 16 && data < 17) || (data > 32 && data < 35) ||
-            (data > 65 && data < 69) || (data > 130 && data < 138) ||
-            (data > 261 && data < 277) || (data > 523 && data < 554) ||
-            (data > 1046 && data < 1108) || (data > 2093 && data < 2217) ||
-            (data > 4186 && data < 4434)) { result := Bits("b0011000") }
-
-        // A
-        when((data > 16 && data < 17) || (data > 32 && data < 35) ||
-            (data > 65 && data < 69) || (data > 130 && data < 138) ||
-            (data > 261 && data < 277) || (data > 523 && data < 554) ||
-            (data > 1046 && data < 1108) || (data > 2093 && data < 2217) ||
-            (data > 4186 && data < 4434)) { result := Bits("b0001000") }
-        
-        // B
-        when((data > 16 && data < 17) || (data > 32 && data < 35) ||
-            (data > 65 && data < 69) || (data > 130 && data < 138) ||
-            (data > 261 && data < 277) || (data > 523 && data < 554) ||
-            (data > 1046 && data < 1108) || (data > 2093 && data < 2217) ||
-            (data > 4186 && data < 4434)) { result := Bits("b0000011") }
-
-        }
-    }
-*/
 
     // Master register
     val masterReg = Reg(next = io.ocp.M)

@@ -7,7 +7,7 @@
   <ExtMem size="2M" DevTypeRef="Sram16" />
 
   <IOs>
-    <IO DevTypeRef="Gpio" offset="4"/>
+     <IO DevTypeRef="Gpio" offset="4"/>
 	<IO DevTypeRef="Tuner" offset="5"/>
 	<IO DevTypeRef="Uart2" offset="6"/>
 	<IO DevTypeRef="Uart3" offset="7"/>
@@ -16,7 +16,7 @@
 	<IO DevTypeRef="Keys" offset="10" intrs="2,3,4,5"/>
     <IO DevTypeRef="EthMac" offset="13" intrs="6,7"/> 
     <IO DevTypeRef="EthMac2" offset="14" intrs="8,9"/>
-    <IO DevTypeRef="LFSR" offset="12" />
+    <IO DevTypeRef="AudioInterface" offset="12"/>
   </IOs>
 
   <Devs>
@@ -88,6 +88,14 @@
           <param name="ioDirection" value="output"/>
       </params>
     </Dev>
-    <Dev DevType="LFSR" entity="LFSR" iface="OcpCore"/> 
+    <Dev DevType="AudioInterface" entity="AudioInterface" iface="OcpCore">
+      <params>
+      <param name="audioLength"   value="16"/>  <!-- either 16, 20, 24 or 32 -->
+      <param name="audioFsDivider"    value="256"/> <!-- depending on chosen Fs (see datasheet) -->
+      <param name="audioClkDivider"   value="6"/>   <!-- for the bclk/xlk: patmosclk / audioClkDivider-->
+      <param name="maxDacBufferPower" value="8"/>  <!-- for a maximum DAC buffer of 2^8 = 256 -->
+      <param name="maxAdcBufferPower" value="8"/>  <!-- for a maximum ADC buffer of 2^8 = 256 -->
+      </params>
+    </Dev>
   </Devs>
 </patmos>

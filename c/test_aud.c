@@ -12,6 +12,10 @@
 #include <machine/patmos.h>
 
 #include "libaudio/audio.c"
+#include "libaudio/audio.h"
+
+const int LIM = 1000;
+const int NOC_MASTER = 0;
 
 int findMax(short * data){
     int i, max;
@@ -67,28 +71,33 @@ int listen() {
     short dataR;
     int exit = 0;    
     
-    setup(0);    
-    exit = setInputBufferSize(65536);
-    if(exit){
-        return exit;
-    }    
-    
-    dataL = (short) malloc(65536 * sizeof(short));
-    dataR = (short) malloc(65536 * sizeof(short));    
-    exit = writeToI2C(addrAnalogue, dataAnalogue);
+    // 1 indicates MIC enabled
+    setup(1);    
 
-    if(exit){
+    exit = setInputBufferSize(65536);
+    if(exit) {
         return exit;
     }    
-    
-    exit = getInputBufferSPM(dataL, dataR);
-    
-    if(exit){
+   
+
+    // pointer to left audio data 
+    //dataL = (short) malloc(65536 * sizeof(short));
+    // pointer to right audio data
+    //dataR = (short) malloc(65536 * sizeof(short));    
+
+    // ADC 
+    exit = getInputBufferSPM(audioAdcLReg, audioAdcRReg);
+    if(exit) {
         return exit;
     }    
     
     int freq = getFreq(dataL);
     return freq;
 }
+/*
+int main() {
+    int l = listen();
+    printf("%d", l);
+}*/
 
 
