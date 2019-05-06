@@ -8,7 +8,7 @@
 
   <IOs>
     <IO DevTypeRef="Gpio" offset="4"/>
-	<IO DevTypeRef="Tuner" offset="5"/>
+	<IO DevTypeRef="TextDisp" offset="5"/>
 	<IO DevTypeRef="Uart2" offset="6"/>
 	<IO DevTypeRef="Uart3" offset="7"/>
 	<IO DevTypeRef="Uart" offset="8"/>
@@ -55,7 +55,7 @@
 				<param name="sramDataWidth" value="16" />
 		</params>
 		</Dev>
-		<Dev DevType="Tuner" entity="Tuner" iface="OcpCore">
+		<Dev DevType="TextDisp" entity="TextDisp" iface="OcpCore">
 			<params>
 				<param name="displayCnt" value="8"/>
 				<param name="polarity" value="0"/>

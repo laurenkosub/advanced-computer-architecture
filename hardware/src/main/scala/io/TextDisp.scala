@@ -8,7 +8,7 @@ import Chisel._
 import patmos.Constants._
 import ocp._
 
-object Tuner extends DeviceObject {
+object TextDisp extends DeviceObject {
   var displayCnt = -1
   var polarity = -1
 
@@ -17,21 +17,21 @@ object Tuner extends DeviceObject {
       polarity = getIntParam(params, "polarity")
   }
 
-  def create(params: Map[String, String]) : Tuner = {
-    Module(new Tuner(displayCnt, polarity))
+  def create(params: Map[String, String]) : TextDisp = {
+    Module(new TextDisp(displayCnt, polarity))
   }
 
   trait Pins {
-    val tunerPins = new Bundle() {
+    val textDispPins = new Bundle() {
       val hexDisp = Vec.fill(displayCnt) {Bits(OUTPUT, 7)}
     }
   }
 }
 
-class Tuner(displayCnt : Int, polarity: Int) extends CoreDevice() {
+class TextDisp(displayCnt : Int, polarity: Int) extends CoreDevice() {
 
     // Override
-    override val io = new CoreDeviceIO() with Tuner.Pins
+    override val io = new CoreDeviceIO() with TextDisp.Pins
 
     // Decode hardware
     def sevenSegBCDDecode(data : Bits) : Bits = {
@@ -98,6 +98,6 @@ class Tuner(displayCnt : Int, polarity: Int) extends CoreDevice() {
     io.ocp.S.Data := dataReg
 
     // Connections to IO
-    io.tunerPins.hexDisp := dispReg
+    io.textDispPins.hexDisp := dispReg
     
 }
