@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 	volatile _IODEV int *uart_ptr = (volatile _IODEV int *)	PATMOS_IO_UART;
 	volatile _IODEV int *led_ptr  = (volatile _IODEV int *) PATMOS_IO_LED;
 	volatile _IODEV int *disp_ptr = (volatile _IODEV int *)	0xf0050000;
-	volatile _IODEV int *lfsr_ptr = (volatile _IODEV int *)	0xf00c0000;
+	volatile _IODEV int *lfsr_ptr = (volatile _IODEV int *)	0xf00e0000;
 
     int x, n, on;
     char resp = 'Y';
@@ -104,9 +104,6 @@ int main(int argc, char **argv)
             case 7: x = SOBEIT; 
                     on = GOOD;
                     break;
-           // case 8: x = NOSIR;
-           //         on = BAD;
-           //         break;
         }
 
         *led_ptr = on;

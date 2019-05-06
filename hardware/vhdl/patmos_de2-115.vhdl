@@ -27,7 +27,16 @@ entity patmos_top is
         oSRAM_OE_N : out std_logic;
         oSRAM_WE_N : out std_logic;
         oSRAM_LB_N : out std_logic;
-        oSRAM_UB_N : out std_logic
+        oSRAM_UB_N : out std_logic;
+        oTextDispPins_hexDisp_7 : out std_logic_vector(6 downto 0);
+            oTextDispPins_hexDisp_6 : out std_logic_vector(6 downto 0);
+                    oTextDispPins_hexDisp_5 : out std_logic_vector(6 downto 0);
+                            oTextDispPins_hexDisp_4 : out std_logic_vector(6 downto 0);
+                                    oTextDispPins_hexDisp_3 : out std_logic_vector(6 downto 0);
+                                            oTextDispPins_hexDisp_2 : out std_logic_vector(6 downto 0);
+                                                    oTextDispPins_hexDisp_1 : out std_logic_vector(6 downto 0);
+                                                            oTextDispPins_hexDisp_0 : out std_logic_vector(6 downto 0)
+
 	);
 end entity patmos_top;
 
@@ -66,7 +75,17 @@ architecture rtl of patmos_top is
             io_sramCtrlPins_ramOut_noe : out std_logic;
             io_sramCtrlPins_ramOut_nwe : out std_logic;
             io_sramCtrlPins_ramOut_nlb : out std_logic;
-            io_sramCtrlPins_ramOut_nub : out std_logic
+            io_sramCtrlPins_ramOut_nub : out std_logic;
+
+         io_textDispPins_hexDisp_7  : out std_logic_vector(6 downto 0);
+                    io_textDispPins_hexDisp_6  : out std_logic_vector(6 downto 0);
+                                io_textDispPins_hexDisp_5  : out std_logic_vector(6 downto 0);
+                                            io_textDispPins_hexDisp_4  : out std_logic_vector(6 downto 0);
+                                                        io_textDispPins_hexDisp_3  : out std_logic_vector(6 downto 0);
+                                                                    io_textDispPins_hexDisp_2  : out std_logic_vector(6 downto 0);
+                                                                                io_textDispPins_hexDisp_1  : out std_logic_vector(6 downto 0);
+                                                                                            io_textDispPins_hexDisp_0  : out std_logic_vector(6 downto 0)
+
 
 		);
 	end component;
@@ -139,6 +158,7 @@ begin
            oLedsPins_led,
            iKeysPins_key,
            oUartPins_txd, iUartPins_rxd,
-           oSRAM_A, sram_out_dout_ena, SRAM_DQ, sram_out_dout, oSRAM_CE_N, oSRAM_OE_N, oSRAM_WE_N, oSRAM_LB_N, oSRAM_UB_N);
+           oSRAM_A, sram_out_dout_ena, SRAM_DQ, sram_out_dout, oSRAM_CE_N, oSRAM_OE_N, oSRAM_WE_N, oSRAM_LB_N, oSRAM_UB_N, 
+           oTextDispPins_hexDisp_7,  oTextDispPins_hexDisp_6,  oTextDispPins_hexDisp_5, oTextDispPins_hexDisp_4, oTextDispPins_hexDisp_3, oTextDispPins_hexDisp_2, oTextDispPins_hexDisp_1,  oTextDispPins_hexDisp_0);
 
 end architecture rtl;

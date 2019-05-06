@@ -13,13 +13,19 @@ class NLFSR(n : Int, start : BigInt) extends Module() {
 
     val io = IO(new Bundle {
         val inc = Input(Bool())
+        val rst_b = Input(Bool())
+        val rst = Input(UInt(width = n))
         val out = Output(UInt(width = n))
     })
     
     // 16 bit
     val feedback = RegInit(UInt(1, 1))
-    val res = RegInit(UInt(64, start.toInt))
-   
+    val res = RegInit(UInt(Math.abs(start.toInt), 64))
+
+    when(io.rst_b) {
+        res := io.rst
+    }  
+ 
     when (io.inc) { 
         // tap values determined via table @ 
         // https://www.embedded.com/print/4015086

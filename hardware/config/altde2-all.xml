@@ -17,6 +17,7 @@
     <IO DevTypeRef="EthMac" offset="13" intrs="6,7"/> 
     <IO DevTypeRef="EthMac2" offset="14" intrs="8,9"/>
     <IO DevTypeRef="A51" offset="12" />
+    <IO DevTypeRef="LFSR" offset="15" />
   </IOs>
 
   <Devs>
@@ -89,5 +90,6 @@
       </params>
     </Dev>
     <Dev DevType="A51" entity="A51" iface="OcpCore"/>
+    <Dev DevType="LFSR" entity="LFSR" iface="OcpCore"/>
   </Devs>
 </patmos>
