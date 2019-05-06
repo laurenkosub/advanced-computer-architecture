@@ -8,30 +8,21 @@ int main() {
     long long key = 0x1223456789ABCDEF;
     *io_ptr = key;
     long long val1;
+    
+    sleep(10);
+    
     val1 = *io_ptr;
-
     printf("bitstream: %llx\n", val1);
-    printf("bit length:%d\n", sizeof(val1));
 
     sleep(3);
 
-    printf("now let's try a different key...");
+    printf("now let's try a different key: 0xabababababababab...\n");
     long long key2 = 0xabababababababab;
     *io_ptr = key2;
     long long val2;
+
+    sleep(10);
+
     val2 = *io_ptr;
-
     printf("bitstream: %llx\n", val2);
-    printf("bit length:%d\n", sizeof(val2));
 }
-
-int countBits(long long number) {
-    int count = 0;
-    while (number != 0)
-    {
-        if ((number & 1) == 1)
-            count++;
-        number = number >> 1;
-    }
-}
-

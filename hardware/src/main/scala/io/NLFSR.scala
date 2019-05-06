@@ -6,9 +6,10 @@ package io
 
 import Chisel._
 import patmos.Constants._
+import java.math.BigInteger
 
 /* n = number of bits */
-class NLFSR(n : Int, start : Int) extends Module() {
+class NLFSR(n : Int, start : BigInt) extends Module() {
 
     val io = IO(new Bundle {
         val inc = Input(Bool())
@@ -17,7 +18,7 @@ class NLFSR(n : Int, start : Int) extends Module() {
     
     // 16 bit
     val feedback = RegInit(UInt(1, 1))
-    val res = RegInit(UInt(start,n))
+    val res = RegInit(UInt(64, start.toInt))
    
     when (io.inc) { 
         // tap values determined via table @ 

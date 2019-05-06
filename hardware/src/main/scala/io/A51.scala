@@ -29,28 +29,41 @@ class A51() extends CoreDevice() {
     val masterReg = Reg(next = io.ocp.M)
 
     // get key from master
-    val key = Reg(init = UInt(1, 64))
+    val key = Reg(init = UInt(0, 64))
     key := masterReg.Data
+
+    printf("key: %x", key);
+
     val count = 0.U
 
     // states
-    val idle :: keying :: running :: Nil = Enum(UInt(), 3)
+    val restart :: idle :: running :: finish :: Nil = Enum(UInt(), 4)
     val stateReg = Reg(init = idle)
     val secretKey = Reg(init = UInt(0,114))
 
     // necessary lfsr's for protocol
-    val lfsr19 = Module(new NLFSR(19, 0x911A))  // holds 19 bits of key
-    val lfsr22 = Module(new NLFSR(22, 0xacf13))  // holds 22 bits of key
-    val lfsr23 = Module(new NLFSR(23, 0x2bcdef))  // holds 23 bits of key
+    val lfsr19 = Module(new NLFSR(19, key(18,0).litValue()))  // holds 19 bits of key
+    val lfsr22 = Module(new NLFSR(22, key(40,19).litValue()))  // holds 22 bits of key
+    val lfsr23 = Module(new NLFSR(23, key(63,41).litValue()))  // holds 23 bits of key
+    lfsr19.io.inc := false.B
+    lfsr22.io.inc := false.B        
+    lfsr23.io.inc := false.B
 
-   // when(stateReg === idle) {
+/*
+    when(stateReg === restart) {
+        val lfsr19 = Module(new NLFSR(19, key(18,0)))  // holds 19 bits of key
+        val lfsr22 = Module(new NLFSR(22, key(40,19)))  // holds 22 bits of key
+        val lfsr23 = Module(new NLFSR(23, key(63,41)))  // holds 23 bits of key
+    }
+*/
+    when(stateReg === idle) {
         lfsr19.io.inc := false.B
-         lfsr22.io.inc := false.B
-         lfsr23.io.inc := false.B
-         //stateReg := keying
-    //}
+        lfsr22.io.inc := false.B
+        lfsr23.io.inc := false.B
+        stateReg := running
+    }
 
-    //when (stateReg === keying) {
+    when (stateReg === running) {
 
         // clock register logic
     val maj = lfsr19.io.out(8) + lfsr22.io.out(10) + lfsr23.io.out(10)
@@ -87,18 +100,20 @@ class A51() extends CoreDevice() {
             lfsr23.io.inc := false.B
         }
     }
-
-    // generate the 114-bit stream
-    when (count < 114.U) {
-        secretKey(count) := (lfsr19.io.out(18) ^ lfsr22.io.out(21) ^ lfsr23.io.out(22))
-        count := count + 1.U
+        
+        // generate the 114-bit stream
+        when (count < 114.U) {
+            secretKey(count) := (lfsr19.io.out(18) ^ lfsr22.io.out(21) ^ lfsr23.io.out(22))
+            count := count + 1.U
+        } .otherwise {
+            stateReg := finish
+        }
     }
-   // }
     
 
         // default response
         val respReg = Reg(init = OcpResp.NULL)
-            respReg := OcpResp.NULL
+        respReg := OcpResp.NULL
 
             // OCP stuff
         when (io.ocp.M.Cmd === OcpCmd.WR) {
