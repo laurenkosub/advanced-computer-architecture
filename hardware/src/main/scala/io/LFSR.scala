@@ -22,14 +22,9 @@ object LFSR extends DeviceObject {
 class LFSR() extends CoreDevice() {
     
   // 16 bit
-  val countReg = Reg(init = UInt(1, 16))
+  val countReg = Reg(init = UInt(0xffff, 16))
   countReg := Cat(countReg(0)^countReg(2)^countReg(3)^countReg(5),countReg(15,1))
   
-  // 4 bit
-  //val countReg = Reg(init = UInt(1, 4))
-  //countReg := Cat(countReg(2)^countReg(3),countReg(3,1))
-  
-
   when (io.ocp.M.Cmd === OcpCmd.WR) {
     countReg := io.ocp.M.Data 
   }

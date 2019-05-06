@@ -3,7 +3,7 @@
 int main() {
     volatile _IODEV int *io_ptr = (volatile _IODEV int *) 0xf00c0000;
     printf("Welcome to A5/1\n");
-    printf("Let the key be 0x89ABCDEF...\n");
+    printf("Let the key be 0xdeadbeefdeadbeef...\n");
 
     long val1, val2;
 
@@ -12,10 +12,10 @@ int main() {
     *io_ptr = key;
    
     // wait for output to be printed ? ... 
-    sleep(30);
     
+
     val1 = *io_ptr;
-    printf("bitstream: %lx\n", val1);
+    printf("bitstream: %x\n", val1);
 /*
     sleep(3);
 
