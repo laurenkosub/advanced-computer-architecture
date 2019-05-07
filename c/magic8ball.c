@@ -85,7 +85,7 @@ int main(int argc, char **argv)
 
         // gen random number with lfsr
         n = *lfsr_ptr % 8;
-        printf("rand #: %d\n", n);
+        //printf("rand #: %d\n", n);
 
         switch(n) {
             case 0: x = YES; 
