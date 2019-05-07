@@ -1,4 +1,9 @@
-This project utilizes LFSRs (Linear Feedback Shift Registers) in a fun magic 8 ball program and a more practical A5/1 cipher stream program. Run the programs from the t-crest/patmos folder.
+This project utilizes LFSRs (Linear-Feedback Shift Registers) in a fun magic 8 
+ball program and a more practical A5/1 cipher stream program. Run the programs 
+from the t-crest/patmos folder.
+
+NOTE : this project should be within t-crest/patmos on your computer, first built
+with the altde2-all Board
 
 To run the magic 8 ball program:
 make comp APP=magic8ball config download
