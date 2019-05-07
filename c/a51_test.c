@@ -2,22 +2,24 @@
 #include <stdio.h>
 
 #define A51_ADDR 0xf00b0000
-
 /*
- * Tests the A5/1 cipher stream protocol
- * Uses a preset key and outputs a 114 bit a/51 cipher stream
- * author: Lauren Kosub s186193
+ * Test the A5/1 Cipher Stream
+ * Takes a hex number as input (key) to generate a 114 bit cipher stream
+ * author: Lauren Kosub
  */
 int main() {
     volatile _IODEV int *io_ptr = (volatile _IODEV int *) A51_ADDR;
-    printf("Welcome to A5/1\n");
-    printf("Let the key be 0x123abcde123abcde...\n");
-
+    
     long val1;
+    long key;
     int secretBit;
 
+    printf("Welcome to A5/1\n");
+    printf("Enter 32-bit hexadecimal value without \"0x\". This will generate your 64 bit key: ");
+    scanf("%lx", &key);
+  
     // let the key be the last 2 bytes of ocp
-    long key = 0xaaabcdef;
+    printf("your key is: %lx%lx\n", key, key);
     *io_ptr = key;
    
     // wait for output to be printed ? ... 

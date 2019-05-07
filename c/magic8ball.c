@@ -6,18 +6,21 @@
 #include <machine/spm.h>
 
 #define DISP_SYM_MASK 0x80
-#define YES 741
-#define NO 48
-#define SURE 22910
-#define ITISSO 336941158
-#define INDEED 1302253
-#define NAY 930
-#define ITISTRUE 336938910
-#define SOBEIT 1354634342
-#define NOSIR 3166582
+#define YES 0x666662e5
+#define NO  0x66666630
+#define SURE 0x6666597e
+#define ITISSO 0x14155066
+#define INDEED 0x6613deed
+#define NAY 0x666663a2
+#define ITISTRUE 0x1415479e
+#define SOBEIT 0x50be1466
+#define NOSIR 0x66306517
 
 #define GOOD 0xf0f0
 #define BAD 0xf0f
+
+#define LFSR_ADDR 0xf00b0000
+#define TEXTDISP_ADDR 0xf0050000
 
 void printSegmentInt(unsigned base_addr, int number, int displayCount)__attribute__((noinline));
 
@@ -52,12 +55,17 @@ void setLeds(int status) {
     return;
 }
 
+/* 
+ * Fun magic 8 ball program that utilizes LFSR instead of using rand() in 
+ * order to determine responses to questions
+ * author: Lauren Kosub s186193
+ */
 int main(int argc, char **argv)
 {
 	volatile _IODEV int *uart_ptr = (volatile _IODEV int *)	PATMOS_IO_UART;
 	volatile _IODEV int *led_ptr  = (volatile _IODEV int *) PATMOS_IO_LED;
-	volatile _IODEV int *disp_ptr = (volatile _IODEV int *)	0xf0050000;
-	volatile _IODEV int *lfsr_ptr = (volatile _IODEV int *)	0xf00c0000;
+	volatile _IODEV int *disp_ptr = (volatile _IODEV int *)	TEXTDISP_ADDR;
+	volatile _IODEV int *lfsr_ptr = (volatile _IODEV int *)	LFSR_ADDR;
 
     int x, n, on;
     char resp = 'Y';

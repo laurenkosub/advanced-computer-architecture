@@ -1,5 +1,6 @@
 /*
- * LFSR 
+ * 16 bit LFSR 
+ * author: Lauren Kosub s186193
  */
 
 package io
@@ -22,7 +23,7 @@ object LFSR extends DeviceObject {
 class LFSR() extends CoreDevice() {
     
   // 16 bit
-  val countReg = Reg(init = UInt(0xffff, 16))
+  val countReg = Reg(init = UInt(1, 16))
   countReg := Cat(countReg(0)^countReg(2)^countReg(3)^countReg(5),countReg(15,1))
   
   when (io.ocp.M.Cmd === OcpCmd.WR) {

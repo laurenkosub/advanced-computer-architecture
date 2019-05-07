@@ -1,5 +1,6 @@
 /*
  * A5/1 Protocol using LFSRs
+ * author: Lauren Kosub s186193
  */
 
 package io
@@ -25,8 +26,16 @@ class A51() extends CoreDevice() {
 
 	override val io = new CoreDeviceIO() with A51.Pins
 
-	// register for requests from OCP master
+	// register for requests from OCP master and default response
     val masterReg = Reg(next = io.ocp.M)
+   	val respReg = Reg(init = OcpResp.NULL)
+   	respReg := OcpResp.NULL
+
+	val key = Reg(init = UInt(1, 64))	// default key is 1
+	when(io.ocp.M.Cmd === OcpCmd.RD) {
+    	respReg := OcpResp.DVA
+        key := io.ocp.M.Data
+   	}
 
 	// states 
 	val step1 :: step2 :: step3 :: Nil = Enum(UInt(), 3)
@@ -34,51 +43,51 @@ class A51() extends CoreDevice() {
 	
 	// declare vars	
 	val done = (state === step3)
-	val count = Reg(init = UInt(0,8))
-	val key = Reg(init = UInt(1, 64))	// default key is alL 1s
+	val count = Reg(init = UInt(0,32))
    	val secretKey = Reg(init = UInt(1,114))
+   	val secretBit = Reg(init = UInt(1,1))
 
 	// necessary lfsr's for protocol
     val lfsr19 = Module(new NLFSR(19, 0x7ffff))  // holds 19 bits of key
-    val lfsr22 = Module(new NLFSR(22, 0x3fffff))  // holds 22 bits of key
-    val lfsr23 = Module(new NLFSR(23, 0x7fffff))  // holds 23 bits of key
+   	val lfsr22 = Module(new NLFSR(22, 0x3fffff))  // holds 22 bits of key
+   	val lfsr23 = Module(new NLFSR(23, 0x7fffff))  // holds 23 bits of key
 
-    // lfsr defaults
-	lfsr19.io.inc := false.B
-	lfsr22.io.inc := false.B
-	lfsr23.io.inc := false.B
+    lfsr19.io.inc := false.B
+    lfsr22.io.inc := false.B
+    lfsr23.io.inc := false.B
+	lfsr19.io.rst := 0x7ffff.U 
+   	lfsr22.io.rst := 0x3fffff.U
+   	lfsr23.io.rst := 0x7fffff.U 
+    lfsr19.io.rst_b := false.B
+    lfsr22.io.rst_b := false.B
+    lfsr23.io.rst_b := false.B
 
-	lfsr19.io.rst_b := false.B
-	lfsr22.io.rst_b := false.B
-	lfsr23.io.rst_b := false.B
-
-	lfsr19.io.rst := 0x7ffff.U
-	lfsr22.io.rst := 0x3fffff.U
-	lfsr23.io.rst := 0x7fffff.U
-	
-    // declare vars    
+	// declare vars    
 	switch(state) {
-		is (step1) {
-			// get key
-			 key := Cat(masterReg.Data(31,0), masterReg.Data(31,0)) 
-			 when (key =/= 0.U) {
-			 	state := step2
-                
-                lfsr19.io.rst_b := true.B
-                lfsr19.io.rst_b := true.B
-                lfsr19.io.rst_b := true.B
+		is(step1) {
+			// get key and start the LFSRs
+	    when(io.ocp.M.Cmd === OcpCmd.RD) {
+    	    respReg := OcpResp.DVA
+            key := Cat(io.ocp.M.Data(31,0), io.ocp.M.Data(31,0))
+   	    }
+			//key := Cat(masterReg.Data(31,0), masterReg.Data(31,0))
+            lfsr19.io.rst_b := true.B
+            lfsr22.io.rst_b := true.B
+            lfsr23.io.rst_b := true.B
+            lfsr19.io.rst := key(18,0)  // holds 19 bits of key
+            lfsr22.io.rst := key(40,19)  // holds 22 bits of key
+            lfsr23.io.rst := key(63,41)  // holds 23 bits of key
+            lfsr19.io.rst_b := false.B
+            lfsr22.io.rst_b := false.B
+            lfsr23.io.rst_b := false.B    
+            lfsr19.io.inc := true.B
+            lfsr22.io.inc := true.B
+            lfsr23.io.inc := true.B
+            state := step2
 
-                lfsr19.io.rst := key(18,0)  // holds 19 bits of key
-    	        lfsr22.io.rst := key(40,19)  // holds 22 bits of key
-    	        lfsr23.io.rst := key(63,41) // holds 23 bits of key
-
-                lfsr19.io.rst_b := false.B
-                lfsr19.io.rst_b := false.B
-                lfsr19.io.rst_b := false.B
-			 }
+            printf("GENERATING SECRET: ");
 		}
 		is (step2) {
-            printf("SECRET KEY IS: ");
 			// calculate bit stream
 			val maj = lfsr19.io.out(8) + lfsr22.io.out(10) + lfsr23.io.out(10)
 			when (maj === 2.U || maj === 3.U) {
@@ -117,20 +126,22 @@ class A51() extends CoreDevice() {
 			    	printf("ERROR");
 			}
 
-		    // generate the 114-bit stream
+		    	// generate the 114-bit stream
 			when (count < UInt(114)) {
-			    secretKey(count) := (lfsr19.io.out(18) ^ lfsr22.io.out(21) ^ lfsr23.io.out(22))
-                printf("%d", (lfsr19.io.out(18)^lfsr22.io.out(21)^lfsr23.io.out(22)))
+			    secretBit := (lfsr19.io.out(18) ^ lfsr22.io.out(21) ^ lfsr23.io.out(22))
+			    printf("%d", secretBit);
+                secretKey(count) := secretBit
 			    count := count + UInt(1)
+                
+                
 			} .otherwise {
 			    //stateReg := finish
 			    printf("\nFINISHED KEY GEN\n");
-                count := UInt(0)
-			    state := step3
+			    when (secretKey =/= key) { state := step3 }
+                printf("SECRET KEY %x%x: ", secretKey(63,32), secretKey(31,0)); 
 			}
 		}
 		is (step3) {
-            Thread.sleep(1000)
 			// return secret key and reset vars
 			key := Reg(init = UInt(1,64))
 			state := step1
@@ -138,19 +149,12 @@ class A51() extends CoreDevice() {
 	}  
 
     // -------------------------- OCP ----------------------------------
- 	// default response
-    val respReg = Reg(init = OcpResp.NULL)
-   	respReg := OcpResp.NULL
-
+ 	
     // OCP stuff
-   	when (io.ocp.M.Cmd === OcpCmd.WR && done) {
-       	secretKey := io.ocp.M.Data 
+	when(io.ocp.M.Cmd === OcpCmd.WR) {
+    	respReg := OcpResp.DVA
    	}
 
-	when(io.ocp.M.Cmd === OcpCmd.RD || io.ocp.M.Cmd === OcpCmd.WR) {
-     	respReg := OcpResp.DVA
-   	}
-    
    	io.ocp.S.Resp := respReg
-   	io.ocp.S.Data := secretKey // output keystream    
+   	io.ocp.S.Data := secretBit  //return one bit of secret at a time
 }

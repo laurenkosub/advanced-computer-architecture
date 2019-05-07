@@ -1,5 +1,6 @@
 /*
  * n bit LFSR 
+ * author: Lauren Kosub s186193
  */
 
 package io

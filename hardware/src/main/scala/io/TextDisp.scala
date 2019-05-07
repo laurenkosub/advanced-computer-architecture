@@ -1,5 +1,7 @@
 /*
- * Seven Segment Hex Display
+ * Seven Segment Hex Display for Magic 8 ball program
+ * Not your average seven segment hex display
+ * author: Lauren Kosub s186193
  */
 
 package io

@@ -1,0 +1,10 @@
+This project utilizes LFSRs (Linear Feedback Shift Registers) in a fun magic 8 ball program and a more practical A5/1 cipher stream program. Run the programs from the t-crest/patmos folder.
+
+To run the magic 8 ball program:
+make comp APP=magic8ball config download
+
+To run the a5/1 program where you specify your key:
+make comp APP=a51_test config download
+
+To run the a5/1 program where the key is already preset:
+make comp APP=test_a51 config download
