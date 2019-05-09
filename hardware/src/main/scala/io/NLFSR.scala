@@ -40,6 +40,8 @@ class NLFSR(n : Int) extends Module() {
             feedback := ~(res(0)^res(21))
         }.elsewhen((n == 23).B) {
             feedback := ~(res(4)^res(22))
+        }.elsewhen((n == 32).B) {
+            feedback := ~(res(1) ^ res(2) ^ res(22))
         }.otherwise { feedback := ~(res(1)^res(2)^res(4)^res(15)) }
         
         val next_res = Cat(feedback,res(n-1, 1))

@@ -28,15 +28,21 @@ class A51() extends CoreDevice() {
 
     // hardcode key for now ...
     val secretBit = Reg(init = UInt(1, 1))
-    val key = Reg(init = UInt(0, 64))
+    val key = Reg(init = UInt(0, 64)) // 64 bit key
 
     // use LFSR to generate random 64 bit key because why not
-    val lfsr_key = Module(new NLFSR(64))
-    lfsr_key.io.seed := 1.U
-    lfsr_key.io.inc := true.B
-    key := lfsr_key.io.out
-    
-    //key := Cat(UInt("h1fabcd1f".U, 32), UInt("h1facbd1f".U, 32))
+/*  
+    val lfsr_key1 = Module(new NLFSR(32))
+    val lfsr_key2 = Module(new NLFSR(32))
+    lfsr_key1.io.seed := 1.U
+    lfsr_key2.io.seed := 1.U
+    lfsr_key1.io.inc := true.B
+    lfsr_key2.io.inc := true.B
+    key := Cat(lfsr_key1.io.out(31,0), lfsr_key2.io.out(31,0))
+*/   
+
+    // use predetermined key
+    key := Cat(UInt("h1fabcd1f".U, 32), UInt("h1facbd1f".U, 32))
     
     // establish OCP default response
     val masterReg = Reg(next = io.ocp.M)
