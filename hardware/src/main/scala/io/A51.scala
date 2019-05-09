@@ -32,6 +32,7 @@ class A51() extends CoreDevice() {
 
     // use LFSR to generate random 64 bit key because why not
     val lfsr_key = Module(new NLFSR(64))
+    lfsr_key.io.seed := 1.U
     lfsr_key.io.inc := true.B
     key := lfsr_key.io.out
     
