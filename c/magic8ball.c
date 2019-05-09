@@ -84,7 +84,7 @@ int main(int argc, char **argv)
         printf("Thinking of response ...\n");
 
         // gen random number with lfsr
-        n = *lfsr_ptr % 8;
+        n = *lfsr_ptr % 9;
         //printf("rand #: %d\n", n);
 
         switch(n) {
@@ -110,6 +110,9 @@ int main(int argc, char **argv)
                     on = GOOD;
                     break;
             case 7: x = SOBEIT; 
+                    on = GOOD;
+                    break;
+            case 8: x = SURE;
                     on = GOOD;
                     break;
         }

@@ -1,7 +1,8 @@
 #include <machine/patmos.h>
 #include <stdio.h>
+#include <unistd.h>
 
-#define A51_ADDR 0xf00b0000
+#define A51_ADDR 0xf00c0000
 
 /*
  * Tests the A5/1 cipher stream protocol
@@ -11,21 +12,38 @@
 int main() {
     volatile _IODEV int *io_ptr = (volatile _IODEV int *) A51_ADDR;
     printf("Welcome to A5/1\n");
-    printf("Let the key be 0x123abcde123abcde...\n");
+    printf("Key: 0x1fabcd1f1fabcd1f\n");
 
-    long val1;
-    int secretBit;
+    int val1;
 
-    // let the key be the last 2 bytes of ocp
-    long key = 0xaaabcdef;
-    *io_ptr = key;
-   
     // wait for output to be printed ? ... 
-    printf("bitstream: ");
-    for (int i = 0; i < 114; i++ ) {
-        for (int j = 0; j < 100000000; j++) {} //delay
-        val1 =  *io_ptr;
-        secretBit = (val1) & 1; // extract 1st bit where data is stored
-        printf("%d", secretBit);
-    }
+    /*printf("bitstream: ");
+    for (int i = 0 ; i < 114; i++) {
+        for (int d = 0; d < 1000; d++ ) {
+            val1 = *io_ptr;
+            printf("%d", val1);
+        }
+    }*/
+
+    printf("%d\n", *io_ptr);
+    sleep(2);
+    printf("%d\n", *io_ptr);
+    sleep(2);
+    printf("%d\n", *io_ptr);
+    sleep(2);
+    printf("%d\n", *io_ptr);
+    sleep(2);
+    printf("%d\n", *io_ptr);
+    sleep(2);
+    printf("%d\n", *io_ptr);
+    sleep(2);
+    printf("%d\n", *io_ptr);
+    sleep(2);
+    printf("%d\n", *io_ptr);
+    sleep(2);
+    printf("%d\n", *io_ptr);
+    sleep(2);
+    printf("%d\n", *io_ptr);
+    sleep(2);
+    printf("%d\n", *io_ptr); 
 }

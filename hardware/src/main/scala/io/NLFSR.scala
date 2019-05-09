@@ -10,23 +10,22 @@ import patmos.Constants._
 import java.math.BigInteger
 
 /* n = number of bits */
-class NLFSR(n : Int, start : BigInt) extends Module() {
+class NLFSR(n : Int) extends Module() {
 
+    /*  inc determines whether or not LFSR advances
+     *   seed represents the init value for the LFSR
+     *   out is the LFSR's output 
+     */
     val io = IO(new Bundle {
         val inc = Input(Bool())
-        val rst_b = Input(Bool())
-        val rst = Input(UInt(width = n))
+        val seed = Input(UInt(width = n))
         val out = Output(UInt(width = n))
     })
     
     // 16 bit
-    val feedback = RegInit(UInt(1, 1))
-    val res = RegInit(UInt(Math.abs(start.toInt), 64))
+    val feedback = RegInit(UInt(0, 1))
+    val res = RegInit(io.seed)
 
-    when(io.rst_b) {
-        res := io.rst
-    }  
- 
     when (io.inc) { 
         // tap values determined via table @ 
         // https://www.embedded.com/print/4015086
@@ -41,7 +40,7 @@ class NLFSR(n : Int, start : BigInt) extends Module() {
             feedback := ~(res(0)^res(21))
         }.elsewhen((n == 23).B) {
             feedback := ~(res(4)^res(22))
-        }.otherwise { feedback := res(0) }
+        }.otherwise { feedback := ~(res(1)^res(2)^res(4)^res(15)) }
         
         val next_res = Cat(feedback,res(n-1, 1))
         res := next_res
