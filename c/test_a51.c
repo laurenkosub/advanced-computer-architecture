@@ -37,7 +37,7 @@ int main() {
     }
 
     // encrypt the message by XORing the message and the generated secret key
-    printf("secret key printed in hex: %lx\n", secKey);
+    //printf("secret key printed in hex: %lx\n", secKey);
     printf("encrypted message printed in hex: %lx\n", secKey ^ plaintext); 
 
 }

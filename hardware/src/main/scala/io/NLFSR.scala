@@ -18,12 +18,12 @@ class NLFSR(n : Int) extends Module() {
      */
     val io = IO(new Bundle {
         val inc = Input(Bool())
-        val seed = Input(UInt(width = n))
-        val out = Output(UInt(width = n))
+        val seed = Input(Bits(width = n))
+        val out = Output(Bits(width = n))
     })
     
     // 16 bit
-    val feedback = RegInit(UInt(0, 1))
+    val feedback = RegInit(Bits(width = 1))
     val res = RegInit(io.seed)
 
     when (io.inc) { 

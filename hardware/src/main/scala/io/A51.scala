@@ -21,88 +21,83 @@ object A51 extends DeviceObject {
     trait Pins {}
 }
 
-// given 64 bit session key
 class A51() extends CoreDevice() {
 
-	//override val io = new CoreDeviceIO() with A51.Pins
+	override val io = new CoreDeviceIO() with A51.Pins  
 
-    // hardcode key for now ...
-    val secretBit = Reg(init = UInt(1, 1))
-    val key = Reg(init = UInt(0, 64)) // 64 bit key
-
-    // use LFSR to generate random 64 bit key because why not
-/*  
-    val lfsr_key1 = Module(new NLFSR(32))
-    val lfsr_key2 = Module(new NLFSR(32))
-    lfsr_key1.io.seed := 1.U
-    lfsr_key2.io.seed := 1.U
-    lfsr_key1.io.inc := true.B
-    lfsr_key2.io.inc := true.B
-    key := Cat(lfsr_key1.io.out(31,0), lfsr_key2.io.out(31,0))
-*/   
-
-    // use predetermined key
-    key := Cat(UInt("h1fabcd1f".U, 32), UInt("h1facbd1f".U, 32))
-    
     // establish OCP default response
     val masterReg = Reg(next = io.ocp.M)
    	val respReg = Reg(init = OcpResp.NULL)
    	respReg := OcpResp.NULL
-	
+   
+    // variables and function declarations 
+    val DEFAULT = "h1fabcd1f".U // arbitrary default
+    val SIZE1 = 19
+    val SIZE2 = 22
+    val SIZE3 = 23
+    val CLKBIT1 = 8
+    val CLKBIT2 = 10
+    val DATA_WIDTH = 32
+
+    val secKey1 = Reg(init = Bits(width = DATA_WIDTH)) // first DATA_WIDTH bits of 114 bit key
+    val secKey2 = Reg(init = Bits(width = DATA_WIDTH)) // second DATA_WIDTH bits 114 bit key
+    val secKey3 = Reg(init = Bits(width = DATA_WIDTH)) // third DATA_WIDTH bits of 114 bit key
+    val secKey4 = Reg(init = Bits(width = 18)) // last 18 bits 114 bit key
+    
+    val idle :: restart :: genKey :: encrypt :: Nil = Enum(UInt(), 4)
+    val stateReg = Reg(init = restart)
+
+    def maj (x : Bits, y : Bits, z : Bits) = {
+        (x & y) ^ (x & z) ^ (y & z)
+    }
+
+    // key is split up between two DATA_WIDTH bit registers to make it 64 bits
+    // because patmos is DATA_WIDTH bit
+    val secretBit = Reg(init = Bits(width = 1))
+    val key1 = Reg(init = UInt(0, 32)) // first DATA_WIDTH bits of 64 bit key
+    key1 := UInt("h1fabcd1f".U, 32)
+    val key2 = Reg(init = UInt(0, 32)) // last DATA_WIDTH bits 64 bit key
+    key2 := UInt("h1fabcd1f".U, 32)	
+
 	// necessary lfsr's for protocol
-    val lfsr19 = Module(new NLFSR(19))
-    lfsr19.io.seed := key(18,0)
+    val lfsr19 = Module(new NLFSR(SIZE1))
+    lfsr19.io.seed := key1(SIZE1-1, 0)
+    lfsr19.io.inc := false.B
 
    	val lfsr22 = Module(new NLFSR(22))
-    lfsr22.io.seed := key(40,19)
+    lfsr22.io.seed := Cat(key1(31, SIZE1), key2(8, 0))
+    lfsr22.io.inc := false.B
 
    	val lfsr23 = Module(new NLFSR(23)) 
-    lfsr23.io.seed := key(63,41)
-
-    lfsr19.io.inc := false.B
-    lfsr22.io.inc := false.B
+    lfsr23.io.seed := key2(31, 9)
     lfsr23.io.inc := false.B
-  
-	val maj = UInt(lfsr19.io.out(8)) + UInt(lfsr22.io.out(10)) + UInt(lfsr23.io.out(10))
+    
+    val maj_bit = maj(  lfsr19.io.out(CLKBIT1), 
+                        lfsr22.io.out(CLKBIT2), 
+                        lfsr23.io.out(CLKBIT2))
 
-	when (maj === 2.U || maj === 3.U) {
-        when (lfsr19.io.out(8) === 0.U) {
-            lfsr19.io.inc := false.B
-        }.otherwise {
-            lfsr19.io.inc := true.B
-        }
-        when (lfsr22.io.out(10) === 0.U) {
-            lfsr22.io.inc := false.B
-        }.otherwise {
-            lfsr22.io.inc := true.B
-        }
-        when (lfsr23.io.out(10) === 0.U) {
-            lfsr23.io.inc := false.B
-        }.otherwise {
-            lfsr23.io.inc := true.B
-        }
-    } .elsewhen(maj === 1.U || maj === 0.U) {
-        when (lfsr19.io.out(8) === 1.U) {
-            lfsr19.io.inc := false.B
-        }.otherwise {
-            lfsr19.io.inc := true.B
-        }
-        when (lfsr22.io.out(10) === 1.U) {
-            lfsr22.io.inc := false.B
-        }.otherwise {
-            lfsr22.io.inc := true.B
-        }
-        when (lfsr23.io.out(10) === 1.U) {
-            lfsr23.io.inc := false.B
-        }.otherwise {
-            lfsr23.io.inc := true.B
-        }
-    }.otherwise {
-        printf("ERROR IN DETERMINING MAJORITY BIT");
+    when (maj_bit === lfsr19.io.out(CLKBIT1)) {
+        lfsr19.io.inc := true.B
+    } .otherwise {
+        lfsr19.io.inc := false.B 
     }
     
+    when (maj_bit === lfsr22.io.out(CLKBIT2)) {
+        lfsr22.io.inc := true.B
+    } .otherwise {
+        lfsr22.io.inc := false.B
+    }
+    
+    when (maj_bit === lfsr23.io.out(CLKBIT2)) {
+        lfsr23.io.inc := true.B
+    } .otherwise {
+        lfsr23.io.inc := false.B
+    }
+
     // output one bit at a time
-    secretBit := (lfsr19.io.out(18) ^ lfsr22.io.out(21) ^ lfsr23.io.out(22))
+    secretBit := (  lfsr19.io.out(SIZE1 - 1) ^ 
+                    lfsr22.io.out(SIZE2 - 1) ^ 
+                    lfsr23.io.out(SIZE3 - 1)    )
     
     // OCP stuff
     when (io.ocp.M.Cmd === OcpCmd.WR) {
