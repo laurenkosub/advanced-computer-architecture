@@ -31,9 +31,9 @@ class NLFSR(n : Int) extends Module() {
         // https://www.embedded.com/print/4015086
         
         when((n == 2).B) {
-            feedback := res(1) ^ res(0)
-	}.elsewhen((n == 3).B) {
-	    feedback := res(0)^res(2)
+            feedback := res(1)^res(0)
+	    }.elsewhen((n == 3).B) {
+	        feedback := res(0)^res(2)
         }.elsewhen((n == 4).B) {
             feedback := res(0)^res(3)
         }.elsewhen((n == 5).B) {
@@ -44,12 +44,12 @@ class NLFSR(n : Int) extends Module() {
             feedback := res(0)^res(6)
         }.elsewhen((n == 8).B) {
             feedback := res(1) ^ res(2) ^ res(3) ^ res(7)
-	}.elsewhen((n == 9).B) {
-	    feedback := res(3)^res(8)
+	    }.elsewhen((n == 9).B) {
+	        feedback := res(3)^res(8)
         }.elsewhen((n == 10).B) {
             feedback := res(9)^res(2)
-	}.elsewhen((n == 11).B) {
-	    feedback := res(1)^res(10)
+	    }.elsewhen((n == 11).B) {
+	        feedback := res(1)^res(10)
         }.elsewhen((n == 12).B) {
             feedback := res(0)^res(3)^res(5)^res(11)
         }.elsewhen((n == 13).B) {
@@ -60,7 +60,7 @@ class NLFSR(n : Int) extends Module() {
             feedback := res(0)^res(14)
         }.elsewhen((n == 16).B) {
             feedback := res(1) ^ res(2) ^ res(4) ^ res(15)        
-	}.elsewhen((n == 17).B) {
+	    }.elsewhen((n == 17).B) {
             feedback := res(2)^res(16)
         }.elsewhen((n == 18).B) {
             feedback := res(6)^res(17)
@@ -68,9 +68,9 @@ class NLFSR(n : Int) extends Module() {
             feedback := res(0)^res(1)^res(4)^res(18)
         }.elsewhen((n == 20).B) {
             feedback := res(2) ^ res(19)
-	}.elsewhen((n == 21).B) {
-	    feedback := res(1)^res(20)
-	}.elsewhen((n == 22).B) {
+	    }.elsewhen((n == 21).B) {
+	        feedback := res(1)^res(20)
+	    }.elsewhen((n == 22).B) {
             feedback := res(0) ^ res(21)
         }.elsewhen((n == 23).B) {
             feedback := res(4) ^ res(22)
@@ -92,7 +92,9 @@ class NLFSR(n : Int) extends Module() {
             feedback := res(2)^res(30)
         }.elsewhen((n == 32).B) {
             feedback := res(1) ^ res(5) ^ res(6) ^ res(31)
-        }.otherwise { feedback := res(1)^res(2)^res(4)^res(15)  \\ default is 16 bit }
+        }.otherwise { 
+            feedback := res(1)^res(2)^res(4)^res(15) //16 bit default
+        }
         
         val next_res = Cat(feedback,res(n-1, 1))
         res := next_res

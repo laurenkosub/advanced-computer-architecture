@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#define A51_ADDR 0xf00c0000
+#define A51_ADDR 0xf00b0000
 
 /*
  * Tests the A5/1 cipher stream protocol
@@ -37,7 +37,7 @@ int main() {
     }
 
     // encrypt the message by XORing the message and the generated secret key
-    //printf("114 bit secret key printed in hex: %lx\n", secKey);
+    printf("secret key printed in hex: %lx\n", secKey);
     printf("encrypted message printed in hex: %lx\n", secKey ^ plaintext); 
 
 }
