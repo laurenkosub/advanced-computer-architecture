@@ -31,7 +31,8 @@ class A51() extends CoreDevice() {
    	respReg := OcpResp.NULL
    
     // variables and function declarations 
-    val DEFAULT = "h1fabcd1f".U // arbitrary default
+    val DEFAULT = "h1fabcd1f".U             // arbitrary default
+    val FRAME = "b1110101011001111001011"   // agreed upon, public frame
     val SIZE1 = 19
     val SIZE2 = 22
     val SIZE3 = 23
@@ -44,8 +45,10 @@ class A51() extends CoreDevice() {
     val secKey3 = Reg(init = Bits(width = DATA_WIDTH)) // third DATA_WIDTH bits of 114 bit key
     val secKey4 = Reg(init = Bits(width = 18)) // last 18 bits 114 bit key
     
-    val idle :: restart :: genKey :: encrypt :: Nil = Enum(UInt(), 4)
-    val stateReg = Reg(init = restart)
+    val frame = Reg(init = UInt(FRAME, 22))
+
+    //val idle :: restart :: genKey :: encrypt :: Nil = Enum(UInt(), 4)
+    //val stateReg = Reg(init = restart)
 
     def maj (x : Bits, y : Bits, z : Bits) = {
         (x & y) ^ (x & z) ^ (y & z)
@@ -63,14 +66,17 @@ class A51() extends CoreDevice() {
     val lfsr19 = Module(new NLFSR(SIZE1))
     lfsr19.io.seed := key1(SIZE1-1, 0)
     lfsr19.io.inc := false.B
+    lfsr19.io.frame := frame
 
    	val lfsr22 = Module(new NLFSR(22))
     lfsr22.io.seed := Cat(key1(31, SIZE1), key2(8, 0))
     lfsr22.io.inc := false.B
+    lfsr22.io.frame := frame
 
    	val lfsr23 = Module(new NLFSR(23)) 
     lfsr23.io.seed := key2(31, 9)
     lfsr23.io.inc := false.B
+    lfsr23.io.frame := frame
     
     val maj_bit = maj(  lfsr19.io.out(CLKBIT1), 
                         lfsr22.io.out(CLKBIT2), 

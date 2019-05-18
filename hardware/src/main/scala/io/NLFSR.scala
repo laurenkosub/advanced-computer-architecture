@@ -19,14 +19,25 @@ class NLFSR(n : Int) extends Module() {
     val io = IO(new Bundle {
         val inc = Input(Bool())
         val seed = Input(Bits(width = n))
+        val frame = Input(Bits(width = 22))     // optional, not considered if = 0
         val out = Output(Bits(width = n))
-    })
-    
+        
+    })    
+
     // 16 bit
     val feedback = RegInit(Bits(width = 1))
     val res = RegInit(io.seed)
+    val frCnt = RegInit(UInt(width = 22))
+
+    // disable frame if = 0
+    when (io.frame === 0.U) {
+        frCnt := UInt(22)
+    } .otherwise {
+        frCnt := UInt(0)
+    }
 
     when (io.inc) { 
+
         // tap values determined via table @ 
         // https://www.embedded.com/print/4015086
         
@@ -95,8 +106,14 @@ class NLFSR(n : Int) extends Module() {
         }.otherwise { 
             feedback := res(1)^res(2)^res(4)^res(15) //16 bit default
         }
-        
-        val next_res = Cat(feedback,res(n-1, 1))
+
+        // clock the LFSRs with frame value if enabled 
+        when (frCnt < 22.U) {    // clock the LFSRs with frame value 
+            feedback := feedback ^ io.frame(frCnt)
+            frCnt := frCnt + UInt(1)                        
+        } 
+
+        val next_res = Cat(res(n-1, 1), feedback)
         res := next_res
     }
 
